@@ -1,0 +1,14 @@
+{
+  "name": "facebook-bot",
+  "version": "1.0.0",
+  "description": "A Facebook group bot to prevent group name and nickname changes",
+  "main": "login.js",
+  "scripts": {
+    "start": "node login.js"
+  },
+  "dependencies": {
+    "fb-chat-api": "^6.3.0"
+  },
+  "author": "",
+  "license": "ISC"
+}
