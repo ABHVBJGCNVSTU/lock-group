@@ -1,30 +1,51 @@
-const config = require('./config.json');
+const puppeteer = require("puppeteer");
 
-module.exports = function(api) {
-  setInterval(() => {
-    config.groups.forEach(group => {
-      // گروپ کا نام مانیٹر کریں
-      api.getThreadInfo(group.group_id, (err, info) => {
-        if (err) return console.error(`Error fetching info for group ${group.group_id}:`, err);
-
-        // Group name ko reset karna
-        if (info.name !== group.original_group_name) {
-          api.changeThreadTitle(group.group_id, group.original_group_name, (err) => {
-            if (err) return console.error(`Error resetting group name for ${group.group_id}:`, err);
-            console.log(`Group name reset for group ${group.group_id}`);
-          });
-        }
-
-        // Members ke nicknames ko monitor aur reset karna
-        info.participants.forEach(member => {
-          if (group.original_member_names[member.userID] && member.nickname !== group.original_member_names[member.userID]) {
-            api.changeUserNickname(group.group_id, member.userID, group.original_member_names[member.userID], (err) => {
-              if (err) return console.error(`Error resetting nickname for ${member.userID}:`, err);
-              console.log(`Nickname reset for ${member.userID} in group ${group.group_id}`);
-            });
-          }
-        });
-      });
+(async () => {
+  try {
+    console.log("Launching browser...");
+    const browser = await puppeteer.launch({
+      headless: true, // براوزر کو بغیر انٹرفیس کے لانچ کریں
+      args: ["--no-sandbox", "--disable-setuid-sandbox"], // ریپلیٹ یا کوڈ اسپیسز پر چلانے کے لیے ضروری ہے
     });
-  }, 5000); // ہر 5 سیکنڈ بعد چیک کریں
-};
+
+    const page = await browser.newPage();
+
+    // لاگ ان ڈیٹا (config.json سے یا یہاں ہارڈ کوڈ کریں)
+    const email = "miaanamir586@gmail.com";
+    const password = "mian222#@";
+    const groupUrl = "https://www.facebook.com/messages/t/8431564663563675/";
+
+    console.log("Navigating to Facebook login...");
+    await page.goto("https://www.facebook.com/login");
+
+    // Facebook پر لاگ ان کریں
+    await page.type('input[name="email"]', email, { delay: 50 });
+    await page.type('input[name="pass"]', password, { delay: 50 });
+    await page.click('button[name="login"]');
+
+    // لاگ ان کے بعد انتظار کریں
+    console.log("Waiting for navigation after login...");
+    await page.waitForNavigation({ waitUntil: "networkidle2" });
+
+    // گروپ کے صفحے پر جائیں
+    console.log("Navigating to the group...");
+    await page.goto(groupUrl);
+
+    // گروپ سیٹنگز کھولیں
+    console.log("Opening group settings...");
+    await page.waitForSelector('span:contains("Edit Group Settings")');
+    await page.click('span:contains("Edit Group Settings")');
+
+    // گروپ کا نام لاک کریں
+    console.log("Locking group name...");
+    await page.waitForSelector('input[name="groupName"]');
+    await page.focus('input[name="groupName"]');
+    await page.keyboard.type("New Locked Group Name");
+    await page.keyboard.press("Enter");
+
+    console.log("Group name updated successfully!");
+    await browser.close();
+  } catch (error) {
+    console.error("An error occurred:", error.message);
+  }
+})();
