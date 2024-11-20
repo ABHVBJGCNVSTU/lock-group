@@ -1,14 +1,14 @@
 {
-  "name": "facebook-bot",
+  "name": "facebook-group-name-lock",
   "version": "1.0.0",
-  "description": "A Facebook group bot to prevent group name and nickname changes",
-  "main": "login.js",
+  "description": "A script to lock Facebook group name using Puppeteer.",
+  "main": "index.js",
   "scripts": {
-    "start": "node login.js"
+    "start": "node index.js"
   },
+  "author": "Your Name",
+  "license": "MIT",
   "dependencies": {
-    "fb-chat-api": "^6.3.0"
-  },
-  "author": "",
-  "license": "ISC"
+    "puppeteer": "^21.0.0"
+  }
 }
